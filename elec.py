@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
  
 #=========================================================================
-#              thermo.py
+#              elec.py
 #-------------------------------------------------------------------------
 # Original sources by JahisLove - 2014, june
 # version 0.1 2014-06-16
@@ -11,24 +11,24 @@
 # version 0.2 2015-08-21
 #
 #-------------------------------------------------------------------------
-# This script read the temperatures of 3 ds18b20 probes on the 1wire
-# and save the values in a MySQL database
-#
+# This script read the counter on 1 s2423 on the 1wire
+# compare the old values to the new one and save the values in a MySQL database
+# this also calculate if we are in night or day mode.
 #
 # tested with python on Raspberry pi distribution: Raspbian GNU/Linux 7 (wheezy) 
 # and Server Apache/2.2.22 (Debian) MySQL: 5.5.43
 #-------------------------------------------------------------------------
-#
-# la base de données doit avoir cette structure:
-# CREATE TABLE `PiTemp` (
+# CREATE TABLE IF NOT EXISTS `PiElec` (
 #  `id` int(11) NOT NULL AUTO_INCREMENT,
 #  `date` datetime NOT NULL,
-#  `sonde1` decimal(3,1) NOT NULL,
-#  `sonde2` decimal(3,1) NOT NULL,
-#  `sonde3` decimal(3,1) NOT NULL,
-#  PRIMARY KEY (`id`)
-#  ) 
-#ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=28 ;
+#  `HP1` decimal(10,2) DEFAULT NULL,
+#  `HC1` decimal(10,2) DEFAULT NULL,
+#  `HP2` decimal(10,2) DEFAULT NULL,
+#  `HC2` decimal(10,2) DEFAULT NULL,
+#  PRIMARY KEY (`id`),
+#  KEY `date` (`date`)
+#  ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=23346 ;
+# ;
 # 
 #===================================================================
  
@@ -119,8 +119,6 @@ def get_delta(counter,newvalue):
     finally:
         return delta
 
-
-
 #----------------------------------------------------------#
 #             code principal                               #
 #----------------------------------------------------------#
@@ -138,17 +136,12 @@ datebuff = d2.strftime('%Y-%m-%d %H:%M:00') #formating date for mySQL
  
 for (i, counter) in enumerate(counters):
     newvalue = read_counter(counter)
-#    print newvalue
-#    print olds[i]
     delta = get_delta(olds[i],newvalue)
     counters[i] = delta
-#ecriture dans la base
+# ecriture dans la base
 if (d2.weekday() >= 5) or (d2 < startHP) or (d2 > startHC):
-#    print ('HC')
     sql="INSERT INTO PiElec (date, HC1, HP1, HC2, HP2) VALUES ('" + datebuff + "','" + str(counters[0]) + "','0','"+ str(counters[1]) + "','0')"
 else:
-#    print ('HP')
     sql="INSERT INTO PiElec (date, HP1, HC1, HP2, HC2) VALUES ('" + datebuff + "','" + str(counters[0]) + "','0','"+ str(counters[1]) + "','0')"
-#print (sql)
 query_db(sql) # on INSERT dans la base
 
