@@ -4,26 +4,30 @@
 #=========================================================================
 #              thermo.py
 #-------------------------------------------------------------------------
-# by JahisLove - 2014, june
+# Original sources by JahisLove - 2014, june
 # version 0.1 2014-06-16
 #-------------------------------------------------------------------------
-# ce script lit les temperatures donnees par 3 sondes DS18B20 reliees
-# au raspberry pi et les stock dans une base MySQL
+# Modifications done by Bruno Faucon - 2015, Augustus
+# version 0.2 2015-08-22
+#-------------------------------------------------------------------------
+# This script read the counter on 1 s2423 on the 1wire
+# compare the old values to the new one and save the values in a MySQL database
+# this also calculate if we are in night or day mode.
 #
-#
-# tested with python 2.7 on Raspberry pi (wheezy) and MariaDB 5.5.34 on NAS Synology DS411J (DSM 5)
-#
+# tested with python on Raspberry pi distribution: Raspbian GNU/Linux 7 (wheezy) 
+# and Server Apache/2.2.22 (Debian) MySQL: 5.5.43
 #-------------------------------------------------------------------------
 #
 # la base de données doit avoir cette structure:
-#CREATE TABLE `PiWater` (
+# CREATE TABLE `PiWater` (
 #  `id` int(11) NOT NULL AUTO_INCREMENT,
 #  `date` datetime NOT NULL,
 #  `W1` decimal(3,1) NOT NULL,
 #  `W2` decimal(3,1) NOT NULL,
 #  PRIMARY KEY (`id`)
-#) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
- 
+#  ) 
+# ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+#
 #===================================================================
  
 #----------------------------------------------------------#
@@ -81,7 +85,7 @@ def read_counter(counter):
         f.close()
         c = int(lines[0])
     except:
-        print "Elec Counter not reachable please take action"
+        print "water Counter not reachable please take action"
         c = '0'
     finally:
         return c
