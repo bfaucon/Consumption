@@ -17,6 +17,8 @@
  3nd adding water consumption 07 Aug 2015
  pulse probe by on http://www.compteur-energie.com/`
 
+ Adding Nest temperature Dec 2015
+ 
 #-------------------------------------------------------------------------
 # Install Raspberry
 #-------------------------------------------------------------------------
@@ -124,6 +126,16 @@ reload config:
 
 #-------------------------------------------------------------------------
 # install Mail
+#-------------------------------------------------------------------------
+http://www.sbprojects.com/projects/raspberrypi/exim4.php
+	sudo apt-get install ssmtp mailutils mpack
+Now edit the file /etc/ssmtp/ssmtp.conf as root and add the next lines. Please note that some of the lines already exist and may need to be changed. Others don't exist yet and need to be added to the end of the file. 
+Testing
+mail -s "This is the subject line" someone@example.com < body.txt  cat body.txt | mail -s "This is the subject line" someone@example.com
+
+
+#-------------------------------------------------------------------------
+# install Nest Library
 #-------------------------------------------------------------------------
 http://www.sbprojects.com/projects/raspberrypi/exim4.php
 	sudo apt-get install ssmtp mailutils mpack
