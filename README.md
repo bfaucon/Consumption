@@ -137,8 +137,17 @@ mail -s "This is the subject line" someone@example.com < body.txt  cat body.tx
 #-------------------------------------------------------------------------
 # install Nest Library
 #-------------------------------------------------------------------------
+<<<<<<< HEAD
 http://www.sbprojects.com/projects/raspberrypi/exim4.php
 	sudo apt-get install ssmtp mailutils mpack
 Now edit the file /etc/ssmtp/ssmtp.conf as root and add the next lines. Please note that some of the lines already exist and may need to be changed. Others don't exist yet and need to be added to the end of the file. 
 Testing
 mail -s "This is the subject line" someone@example.com < body.txt  cat body.txt | mail -s "This is the subject line" someone@example.com
+=======
+http://www.smbaker.com/a-python-api-for-the-nest-learning-thermostat
+https://github.com/smbaker/pynest
+
+Adding crontab
+4,9,14,19,24,29,34,39,44,49,54,59 * * * * python /home/pi/pynest/nest_brfa.py --user bruno@famillefaucon.be --password Kate013. curtemp >/home/pi/pynest/temp
+*/5 * * * * python /home/pi/pynest/nest_brfa.py --user bruno@famillefaucon.be --password Kate013. save
+>>>>>>> Nest
