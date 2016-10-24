@@ -4,7 +4,7 @@
 #=========================================================================
 #              boiler.py
 #-------------------------------------------------------------------------
-# by Bruno Faucon - 201, june
+# by Bruno Faucon - 2015, june
 # version 0.1 2015-06-18
 #-------------------------------------------------------------------------
 #
@@ -28,8 +28,8 @@ from threading import Timer
 PATH_THERM = "/home/pi/consumption/" #path to this script
 PATH_LOG = "/home/pi/consumption/log" #path to this script
 DB_SERVER ='localhost'  # MySQL : IP server (localhost if mySQL is on the same machine)
-DB_USER='root'     # MySQL : user
-DB_PWD='Kate0130'            # MySQL : password
+DB_USER='*User*'     # MySQL : user
+DB_PWD='********'            # MySQL : password
 DB_BASE='consumption'     # MySQL : database name
 STATE = 0     # conteint RED_LED ou GREEN_ en fonction de la LED Actuellement allumée
 LOG_LEVEL = 0
