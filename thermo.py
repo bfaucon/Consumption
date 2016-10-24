@@ -44,8 +44,8 @@ import MySQLdb   # MySQLdb must be installed by yourself
 PATH_THERM = "/home/pi/consumption/" #path to this script
 PATH_LOG = "/home/pi/consumption/log" #path to this script
 DB_SERVER ='localhost'  # MySQL : IP server (localhost if mySQL is on the same machine)
-DB_USER='root'     # MySQL : user
-DB_PWD='Kate0130'            # MySQL : password
+DB_USER='*User*'     # MySQL : user
+DB_PWD='********'            # MySQL : password
 DB_BASE='consumption'     # MySQL : database name
  
 # vous pouvez ajouter ou retirer des sondes en modifiant les 5 lignes ci dessous
