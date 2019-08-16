@@ -26,7 +26,29 @@ start with raspberry pi
 http://blog.idleman.fr/tutoriel-02-brancher-et-installer-le-raspberry-pi/
 
 configure Wlan & Ethernet
+
 sudo nano /etc/network/interfaces
+iface lo inet loopback
+#iface eth0 inet dhcp
+iface eth0 inet static
+address 192.168.2.11
+netmask 255.255.255.0
+gateway 192.168.2.1
+
+#allow-hotplug wlan0
+#iface wlan0 inet manual
+#wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+#iface default inet dhcp
+
+allow-hotplug wlan0
+iface wlan0 inet static
+address 192.168.2.12
+netmask 255.255.255.0
+gateway 192.168.2.1
+
+wpa-ssid "WiFi-2.4-b97a"
+#wpa-ssid "devolo-rdc"
+wpa-psk "366A3E94DD"
 
 #-------------------------------------------------------------------------
 # Configure Dynhost
@@ -42,6 +64,9 @@ Automate the script to run every 5 Minutes…
 sudo crontab -e
 	Add lines:
 
+#Check IP every 5 minutes and update dns ovh in case of change.
+*/5 * * * * /home/pi/DynHost/dynhost.sh
+
 #-------------------------------------------------------------------------
 # Date automation
 #-------------------------------------------------------------------------
@@ -49,13 +74,60 @@ sudo apt-get install ntpdate
 Automate the script to run every hour…
 sudo crontab -e
 	add lines
+#Update Time Every hours
+0 */1 * * * ntpdate -u pool.ntp.org
 
 #-------------------------------------------------------------------------
 # Configure OWFS
 #-------------------------------------------------------------------------
 
-https://www.abelectronics.co.uk/owfs-and-compi/info.aspx
+You first need to activate I2C in raspi-config
+sudo raspi-config
+Go to 
+8 Advanced Options           Configure advanced settings
+Go to 
+A7 I2C 
+Enable I2C.
+
+Install from https://www.abelectronics.co.uk/owfs-and-compi/info.aspx
+
+Modules: Ensure that the i2c-bus module is not included in the blacklist file:
+sudo nano /etc/modprobe.d/raspi-blacklist.conf
+You need to add “#” before this line: blacklist i2c-bcm2708
+Save your changes Ensure that the i2c-dev module is included in /etc/modules
+sudo nano /etc/modules
+Add "i2c-dev" on it's own row in the file and save your changes.
+Installation of the OWFS (One Wire File System) First you need to install the following packages:
+sudo apt-get update
+sudo apt-get install automake autoconf autotools-dev gcc-4.7 libtool libusb-dev libfuse-dev swig python2.6-dev tcl8.4-dev php5-dev i2c-tools
+If promoted answer Yes on any questions during the install. Download the latest version of OWFS to your usr/src directory
+cd /usr/src
+sudo wget -O owfs-latest.tgz http://sourceforge.net/projects/owfs/files/latest/download
+Unpack with the following command:
+sudo tar xzvf owfs-latest.tgz
+Next you must configure OWFS: (replace X.XXXX with the version number you downloaded)
+cd owfs-X.XXXX
+sudo ./configure
+If everything is correct, you should get a result like this:
+Current configuration: Deployment location: /opt/owfs Compile-time options: Caching is enabled USB is DISABLED
+etc.
+Next you need to compile OWFS which will take approx. 30 minutes with the following command:
+sudo make
+Next install OWFS which will take a few minutes
+sudo make install
+Once the installation has completed you need to create a mountpoint for the 1wire folder:
+sudo mkdir /mnt/1wire
+In order to use the 1wire devices without root privileges you have to change the FUSE settings, edit the fuse configuration file with:
+sudo nano /etc/fuse.conf
+Update this line: #user_allow_other and remove the # from the start, then save your changes
+You can now start using OWFS to access your i2c devices and any connected sensors:
+sudo /opt/owfs/bin/owfs --i2c=ALL:ALL --allow_other /mnt/1wire/
+Using a terminal window navigate to the /mnt/1wire/ directory and use the ls command to list all connected devices.
+If you have a temperature sensor connected you should have a folder starting with 10.xxxxxx
+cd into this folder and then enter cat temperature to read the temperature of the sensor.
+
 Start OWFS at the boot of Raspberry:
+
 I have file /etc/init.d/onewire. It contains:
 #!/bin/sh
 mkdir /media/1wire
@@ -67,6 +139,15 @@ and to make it start on startup, then do:
 update-rc.d onewire defaults
 
 		sudo /opt/owfs/bin/owfs --i2c=ALL:ALL --allow_other /mnt/1wire/
+
+Automate this to run at startup
+sudo crontab -e
+	add lines
+# init 1 Wire at startup
+@reboot /home/pi/consumption/init1wire.sh
+
+		
+		
 
 #-------------------------------------------------------------------------
 # Changing security to be done.
