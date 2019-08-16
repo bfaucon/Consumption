@@ -229,6 +229,5 @@ http://www.smbaker.com/a-python-api-for-the-nest-learning-thermostat
 https://github.com/smbaker/pynest
 
 Adding crontab
-4,9,14,19,24,29,34,39,44,49,54,59 * * * * python /home/pi/pynest/nest_brfa.py --user bruno@famillefaucon.be --password Kate013. curtemp >/home/pi/pynest/temp
-*/5 * * * * python /home/pi/pynest/nest_brfa.py --user bruno@famillefaucon.be --password Kate013. save
->>>>>>> Nest
+4,9,14,19,24,29,34,39,44,49,54,59 * * * * python /home/pi/pynest/nest_brfa.py --user bruno@famillefaucon.be --password ******** curtemp >/home/pi/pynest/temp
+
