@@ -9,7 +9,10 @@
 #-------------------------------------------------------------------------
 # Modifications done by Bruno Faucon - 2015, Augustus
 # version 0.2 2015-08-21
-#
+#-------------------------------------------------------------------------
+# Modifications done by Bruno Faucon - 2018, Augustus
+# version 0.3 2018-01-28#
+# Add a 3rd counter for Wash machines.
 #-------------------------------------------------------------------------
 # This script read the counter on 1 s2423 on the 1wire
 # compare the old values to the new one and save the values in a MySQL database
@@ -47,21 +50,28 @@ from threading import Timer
 #-----------------------------------------------------------------#
 PATH_THERM = "/home/pi/consumption/" #path to this script
 PATH_LOG = "/home/pi/consumption/log" #path to this script
-DB_SERVER ='localhost'  # MySQL : IP server (localhost if mySQL is on the same machine)
-DB_USER='*Username*'     # MySQL : user
-DB_PWD='*******'            # MySQL : password
+
+DB_SERVER ='192.168.2.10'  # MySQL : IP server (localhost if mySQL is on the same machine)
+DB_USER='conso'     # MySQL : user
+DB_PWD='********************'            # MySQL : password
 DB_BASE='consumption'     # MySQL : database name
+DB_PORT=3307
+
  
 # vous pouvez ajouter ou retirer des sondes en modifiant les 5 lignes ci dessous
 # ainsi que la derniere ligne de ce script : querydb(....
-counter1 = "/mnt/1wire/1D.B2D50D000000/counter.A"
-counter2 = "/mnt/1wire/1D.B2D50D000000/counter.B"
-counters = [counter1, counter2]
-counter_value = [0, 0]
+counter1 = "/mnt/1wire/1D.C5600F000000/counter.A"
+counter2 = "/mnt/1wire/1D.C5600F000000/counter.B"
+counter3 = "/mnt/1wire/1D.B2D50D000000/counter.A"
+counter4 = "/mnt/1wire/1D.B2D50D000000/counter.B"
+counters = [counter1, counter2, counter3, counter4]
+counter_value = [0, 0, 0, 0]
 old1 = "/home/pi/consumption/oldcountA"
 old2 = "/home/pi/consumption/oldcountB"
-olds = [old1, old2]
-old_value = [0, 0]
+old3 = "/home/pi/consumption/oldcountE"
+old4 = "/home/pi/consumption/oldcountF"
+olds = [old1, old2, old3, old4]
+old_value = [0, 0, 0, 0]
  
 #----------------------------------------------------------#
 #             Variables                                    #
@@ -71,7 +81,7 @@ old_value = [0, 0]
 #     definition : database query                          #
 #----------------------------------------------------------#
 def query_db(sql):
-    db = MySQLdb.connect(DB_SERVER, DB_USER, DB_PWD, DB_BASE)
+    db = MySQLdb.connect(DB_SERVER, DB_USER, DB_PWD, DB_BASE, DB_PORT)
     cursor = db.cursor()
     cursor.execute(sql)
     db.commit()
@@ -140,8 +150,8 @@ for (i, counter) in enumerate(counters):
     counters[i] = delta
 # ecriture dans la base
 if (d2.weekday() >= 5) or (d2 < startHP) or (d2 > startHC):
-    sql="INSERT INTO PiElec (date, HC1, HP1, HC2, HP2) VALUES ('" + datebuff + "','" + str(counters[0]) + "','0','"+ str(counters[1]) + "','0')"
+    sql="INSERT INTO PiElec (date, HC1, HP1, HC2, HP2, HC3, HP3, HC4, HP4) VALUES ('" + datebuff + "','" + str(counters[0]) + "','0','"+ str(counters[1]) + "','0','"+ str(counters[2]) + "','0','"+ str(counters[3]/2) + "','0')"
 else:
-    sql="INSERT INTO PiElec (date, HP1, HC1, HP2, HC2) VALUES ('" + datebuff + "','" + str(counters[0]) + "','0','"+ str(counters[1]) + "','0')"
+    sql="INSERT INTO PiElec (date, HP1, HC1, HP2, HC2, HP3, HC3, HP4, HC4) VALUES ('" + datebuff + "','" + str(counters[0]) + "','0','"+ str(counters[1]) + "','0','"+ str(counters[2]) + "','0','"+ str(counters[3]/2) + "','0')"
 query_db(sql) # on INSERT dans la base
 
