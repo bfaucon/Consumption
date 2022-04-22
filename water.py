@@ -2,32 +2,31 @@
 # -*- coding: utf-8 -*-
  
 #=========================================================================
-#              thermo.py
+#              water.py
 #-------------------------------------------------------------------------
-# Original sources by JahisLove - 2014, june
+# by JahisLove - 2014, june
 # version 0.1 2014-06-16
+# Modifications done by Bruno Faucon - 2020
+# version 0.3 2020-05-06
+# connection au sql synology
+# version 0,4 2022-04-20
+# Cleaning code
 #-------------------------------------------------------------------------
-# Modifications done by Bruno Faucon - 2015, Augustus
-# version 0.2 2015-08-22
-#-------------------------------------------------------------------------
-# This script read the counter on 1 s2423 on the 1wire
-# compare the old values to the new one and save the values in a MySQL database
-# this also calculate if we are in night or day mode.
-#
-# tested with python on Raspberry pi distribution: Raspbian GNU/Linux 7 (wheezy) 
-# and Server Apache/2.2.22 (Debian) MySQL: 5.5.43
+# Script reading value of 2 1Wire counter linked to RaspberryPi and save in MySQL
 #-------------------------------------------------------------------------
 #
-# la base de données doit avoir cette structure:
+# Table in database must have this structure
+#
 # CREATE TABLE `PiWater` (
 #  `id` int(11) NOT NULL AUTO_INCREMENT,
 #  `date` datetime NOT NULL,
-#  `W1` decimal(3,1) NOT NULL,
+#  `W1` decimal(3,1) NOT NULL, 
 #  `W2` decimal(3,1) NOT NULL,
 #  PRIMARY KEY (`id`)
-#  ) 
-# ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+#) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 #
+# W1 = Eau froide seule
+# W2 = Eau Chaude seule 
 #===================================================================
  
 #----------------------------------------------------------#
@@ -45,11 +44,13 @@ from threading import Timer
 #-----------------------------------------------------------------#
 PATH_THERM = "/home/pi/consumption/" #path to this script
 PATH_LOG = "/home/pi/consumption/log" #path to this script
-DB_SERVER ='localhost'  # MySQL : IP server (localhost if mySQL is on the same machine)
-DB_USER='*username*'     # MySQL : user
-DB_PWD='********'            # MySQL : password
+DB_SERVER ='192.168.2.10'  # MySQL : IP server (localhost if mySQL is on the same machine)
+DB_USER='conso'     # MySQL : user
+DB_PWD='**********'            # MySQL : password
 DB_BASE='consumption'     # MySQL : database name
- 
+DB_PORT=3307     # MySQL : database port
+
+
 # vous pouvez ajouter ou retirer des sondes en modifiant les 5 lignes ci dessous
 # ainsi que la derniere ligne de ce script : querydb(....
 counter1 = "/mnt/1wire/1D.AEB40D000000/counter.A"
@@ -69,7 +70,7 @@ old_value = [0, 0]
 #     definition : database query                          #
 #----------------------------------------------------------#
 def query_db(sql):
-    db = MySQLdb.connect(DB_SERVER, DB_USER, DB_PWD, DB_BASE)
+    db = MySQLdb.connect(DB_SERVER, DB_USER, DB_PWD, DB_BASE, DB_PORT)
     cursor = db.cursor()
     cursor.execute(sql)
     db.commit()
@@ -85,7 +86,7 @@ def read_counter(counter):
         f.close()
         c = int(lines[0])
     except:
-        print "water Counter not reachable please take action"
+        print "Water Counter not reachable please take action"
         c = '0'
     finally:
         return c
@@ -120,7 +121,7 @@ def get_delta(counter,newvalue):
 
 
 #----------------------------------------------------------#
-#             code principal                               #
+#             Primary Code                                 #
 #----------------------------------------------------------#
  
 # initialize Raspberry GPIO and DS18B20
@@ -142,6 +143,8 @@ for (i, counter) in enumerate(counters):
     counters[i] = delta
 #ecriture dans la base
 sql="INSERT INTO PiWater (date, W1, W2) VALUES ('" + datebuff + "','" + str(counters[0]) + "','"+ str(counters[1]) + "')"
+#sql="INSERT INTO PiWater (date, W1, W2) VALUES ('" + datebuff + "','" + str(counters[0]) + "','0')"
+
 #print (sql)
 query_db(sql) # on INSERT dans la base
 
