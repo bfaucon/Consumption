@@ -9,6 +9,9 @@
 #-------------------------------------------------------------------------
 # Modifications done by Bruno Faucon - 2015, Augustus
 # version 0.2 2015-08-21
+# Modifications done by Bruno Faucon - 2020
+# version 0.3 2020-05-06
+# connection au sql synology
 #-------------------------------------------------------------------------
 # This script read the temperatures of 3 ds18b20 probes on the 1wire
 # and save the values in a MySQL database
@@ -43,16 +46,24 @@ import MySQLdb   # MySQLdb must be installed by yourself
 #-----------------------------------------------------------------#
 PATH_THERM = "/home/pi/consumption/" #path to this script
 PATH_LOG = "/home/pi/consumption/log" #path to this script
-DB_SERVER ='localhost'  # MySQL : IP server (localhost if mySQL is on the same machine)
-DB_USER='*User*'     # MySQL : user
-DB_PWD='********'            # MySQL : password
+DB_SERVER ='192.168.2.10'  # MySQL : IP server (localhost if mySQL is on the same machine)
+DB_USER='conso'     # MySQL : user
+DB_PWD='*************'            # MySQL : password
 DB_BASE='consumption'     # MySQL : database name
- 
+DB_PORT=3307
+
 # vous pouvez ajouter ou retirer des sondes en modifiant les 5 lignes ci dessous
 # ainsi que la derniere ligne de ce script : querydb(....
+# Ancienne Sonde bureau 
 sonde1 = "/mnt/1wire/28.C7C65D060000/temperature"
+# Nouvelle Sonde bureau
+sonde1 = "/mnt/1wire/28.DAB51F070000/temperature"
+# Sonde Extérieure
 sonde2 = "/mnt/1wire/28.B83370060000/temperature"
+# Sonde Garage
 sonde3 = "/mnt/1wire/28.0CCA5D060000/temperature"
+# Nouvelle Sonde Garage
+sonde3 = "/mnt/1wire/28.9CD61E070000/temperature"
 sondes = [sonde1, sonde2, sonde3]
 sonde_value = [0, 0, 0]
  
@@ -66,7 +77,7 @@ backup_mode = 0
 def query_db(sql):
     global backup_mode
     global backup_row
-    db = MySQLdb.connect(DB_SERVER, DB_USER, DB_PWD, DB_BASE) 
+    db = MySQLdb.connect(DB_SERVER, DB_USER, DB_PWD, DB_BASE, DB_PORT) 
     cursor = db.cursor() # creation du curseur
     if backup_mode == 0:
         cursor.execute(sql) #execution de la requete
@@ -100,6 +111,6 @@ for (i, sonde) in enumerate(sondes):
 
  
 #ecriture dans la base
-query_db("""INSERT INTO PiTemp (date, sonde1, sonde2, sonde3) VALUES ('%s','%s','%s','%s')
+query_db("""INSERT INTO PiTemp (date, sonde1, sonde2, sonde3, sonde4) VALUES ('%s','%s','%s','%s', '0')
          """ % (datebuff, sonde_value[0], sonde_value[1], sonde_value[2]))
 
