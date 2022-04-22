@@ -38,8 +38,8 @@
 #0 */1 * * * /home/pi/consumption/init1wire.sh
 
 # Save the temperature of the Nest in a temp file before reading it
-#*/2 * * * * python /home/pi/pynest/nest.py --user bruno@famillefaucon.be --password ********** --celsius curtemp > /home/pi/pynest/temp
-#4,9,14,19,24,29,34,39,44,49,54,59 * * * * python /home/pi/pynest/nest.py --user bruno@famillefaucon.be --password ********** --celsius curtem$
+#*/2 * * * * python /home/pi/pynest/nest.py --user bruno@***** --password ******* --celsius curtemp > /home/pi/pynest/temp
+#4,9,14,19,24,29,34,39,44,49,54,59 * * * * python /home/pi/pynest/nest.py --user bruno@***** --password ******** --celsius curtem$
 
 # Check Water consuption and Send Email if issue
 6,11,16,21,26,31,36,41,46,51,56 * * * * python /home/pi/consumption/water_test.py
@@ -52,4 +52,3 @@
 
 # every 5 min read elec and save it in dB
 #ici le bon */5 * * * * python /home/pi/consumption/elec.py
-
